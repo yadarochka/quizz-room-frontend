@@ -38,7 +38,7 @@ export function CreateQuizPage() {
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [aiTopic, setAiTopic] = useState('');
 	const [questionCount, setQuestionCount] = useState(5);
-	const [aiProvider, setAiProvider] = useState<'groq'>('groq');
+	const aiProvider: 'groq' = 'groq';
 
 	const handleChangeQuestion = (id: number, value: string) => {
 		setQuestions((prev) =>
