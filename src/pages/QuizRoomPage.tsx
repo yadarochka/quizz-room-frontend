@@ -189,6 +189,11 @@ export function QuizRoomPage() {
 		socket.on('question_timeout', () => {
 			// Время на вопрос истекло, показываем результаты
 			setCurrentQuestion(null);
+			setTimeLeft(0);
+			if (timerIntervalRef.current) {
+				clearInterval(timerIntervalRef.current);
+				timerIntervalRef.current = null;
+			}
 		});
 
 		socket.on('quiz_finished', (payload: { results?: unknown }) => {
