@@ -117,6 +117,49 @@ export function CreateQuizPage() {
 		);
 	};
 
+	const handleGenerateQuestions = async () => {
+		if (!aiTopic.trim()) {
+			setError('Введите тему для генерации вопросов');
+			return;
+		}
+
+		setIsGenerating(true);
+		setError(null);
+
+		try {
+			const result = await generateQuestions({
+				topic: aiTopic.trim(),
+				count: 5,
+			});
+
+			// Преобразуем сгенерированные вопросы в формат EditableQuestion
+			const generatedQuestions: EditableQuestion[] = result.questions.map(
+				(q: GeneratedQuestion) => ({
+					id: Date.now() + Math.random(),
+					text: q.text,
+					timeLimit: q.time_limit,
+					options: q.answers.map((answer, idx) => ({
+						id: Date.now() + Math.random() + idx,
+						text: answer.text,
+						isCorrect: answer.is_correct,
+					})),
+				}),
+			);
+
+			// Добавляем сгенерированные вопросы к существующим
+			setQuestions((prev) => [...prev, ...generatedQuestions]);
+			setAiTopic(''); // Очищаем поле после успешной генерации
+		} catch (err) {
+			const message =
+				err instanceof Error
+					? err.message
+					: 'Не удалось сгенерировать вопросы. Проверьте настройки API.';
+			setError(message);
+		} finally {
+			setIsGenerating(false);
+		}
+	};
+
 	const handleCreateQuiz = async (event: FormEvent) => {
 		event.preventDefault();
 		setError(null);
