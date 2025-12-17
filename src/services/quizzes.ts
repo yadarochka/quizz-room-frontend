@@ -127,4 +127,31 @@ export async function getSessionResults(
 	return apiRequest<SessionResults>(`/api/sessions/${sessionId}/results`);
 }
 
+export type GenerateQuestionsPayload = {
+	topic: string;
+	count?: number;
+};
+
+export type GeneratedQuestion = {
+	text: string;
+	time_limit: number;
+	answers: Array<{
+		text: string;
+		is_correct: boolean;
+	}>;
+};
+
+export type GenerateQuestionsResponse = {
+	questions: GeneratedQuestion[];
+};
+
+export async function generateQuestions(
+	payload: GenerateQuestionsPayload,
+): Promise<GenerateQuestionsResponse> {
+	return apiRequest<GenerateQuestionsResponse>('/api/quizzes/generate-questions', {
+		method: 'POST',
+		body: JSON.stringify(payload),
+	});
+}
+
 

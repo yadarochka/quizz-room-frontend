@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
 	createQuiz,
 	createSession,
+	generateQuestions,
+	type GeneratedQuestion,
 } from '../services/quizzes';
 import type { Question } from '../types/quiz';
 
@@ -33,6 +35,8 @@ export function CreateQuizPage() {
 	]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [aiTopic, setAiTopic] = useState('');
 
 	const handleChangeQuestion = (id: number, value: string) => {
 		setQuestions((prev) =>
@@ -219,6 +223,56 @@ export function CreateQuizPage() {
 							}
 						/>
 					</label>
+
+					{/* AI Generation Section */}
+					<div style={{
+						background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+						padding: '1.5rem',
+						borderRadius: '12px',
+						marginBottom: '2rem',
+						color: 'white',
+					}}>
+						<h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem' }}>
+							🤖 Генерация вопросов с помощью ИИ
+						</h3>
+						<div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+							<label className="field" style={{ flex: 1, margin: 0 }}>
+								<span className="field__label" style={{ color: 'white' }}>
+									Тема квиза
+								</span>
+								<input
+									type="text"
+									className="field__input"
+									placeholder="Например: История России, Математика, Фильмы 90-х"
+									value={aiTopic}
+									onChange={(event) => setAiTopic(event.target.value)}
+									disabled={isGenerating}
+									style={{ background: 'white' }}
+								/>
+							</label>
+							<button
+								type="button"
+								className="primary-button"
+								onClick={handleGenerateQuestions}
+								disabled={isGenerating || !aiTopic.trim()}
+								style={{
+									background: isGenerating || !aiTopic.trim() ? '#999' : 'white',
+									color: isGenerating || !aiTopic.trim() ? '#ccc' : '#667eea',
+									border: 'none',
+									padding: '0.75rem 1.5rem',
+									borderRadius: '8px',
+									cursor: isGenerating || !aiTopic.trim() ? 'not-allowed' : 'pointer',
+									fontWeight: 'bold',
+									whiteSpace: 'nowrap',
+								}}
+							>
+								{isGenerating ? '⏳ Генерируем...' : '✨ Сгенерировать вопросы'}
+							</button>
+						</div>
+						<p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+							ИИ создаст 5 вопросов с вариантами ответов по указанной теме
+						</p>
+					</div>
 
 					<div className="questions-block">
 						<div className="questions-block__header">
