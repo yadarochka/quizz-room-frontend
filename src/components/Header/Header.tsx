@@ -69,24 +69,7 @@ export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
 						<button
 							type="button"
 							onClick={handleLogout}
-							className="header__logout"
-							style={{
-								background: 'transparent',
-								border: 'none',
-								color: 'inherit',
-								cursor: 'pointer',
-								fontSize: 'inherit',
-								fontFamily: 'inherit',
-								padding: '0.5rem 1rem',
-								borderRadius: '8px',
-								transition: 'background-color 0.2s',
-							}}
-							onMouseEnter={(e) => {
-								e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
-							}}
-							onMouseLeave={(e) => {
-								e.currentTarget.style.backgroundColor = 'transparent';
-							}}
+							className="header__nav-link"
 						>
 							Выйти
 						</button>

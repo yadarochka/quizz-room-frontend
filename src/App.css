@@ -38,12 +38,21 @@
   margin-left: auto;
 }
 
-.header__nav a {
+.header__nav a,
+.header__nav-link {
   color: #6b7280;
   text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0;
+  transition: color 0.2s;
 }
 
-.header__nav a:hover {
+.header__nav a:hover,
+.header__nav-link:hover {
   color: #4f46e5;
 }
 
