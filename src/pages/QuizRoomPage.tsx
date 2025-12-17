@@ -498,70 +498,303 @@ export function QuizRoomPage() {
 
 	// Обычный вид комнаты (до начала квиза)
 	return (
-		<main className="section section--center">
-			<section className="auth-card">
-				<h1 className="auth-title">Комната квиза</h1>
-				{session.room_code ? (
-					<div className="room-code">
-						Код комнаты: <strong>{session.room_code}</strong>
+		<main className="section section--center" style={{ padding: '2rem 1rem', minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+			<section className="auth-card" style={{
+				maxWidth: '900px',
+				width: '100%',
+				padding: '3rem 2rem',
+				background: 'white',
+				borderRadius: '24px',
+				boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+			}}>
+				{/* Заголовок */}
+				<div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+					<div style={{
+						fontSize: '4rem',
+						marginBottom: '1rem',
+						animation: 'pulse 2s infinite',
+					}}>
+						🎯
 					</div>
-				) : null}
-				<p className="section__subtitle">
-					Статус: {session.status === 'waiting' ? 'Ожидание' : 'В процессе'}
-				</p>
-				<p className="section__subtitle">
-					Подключение: {socketStatus === 'joined' ? 'Подключено' : socketStatus}
-				</p>
+					<h1 style={{
+						margin: '0 0 0.5rem 0',
+						fontSize: '2.5rem',
+						background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+						WebkitBackgroundClip: 'text',
+						WebkitTextFillColor: 'transparent',
+						fontWeight: 'bold',
+					}}>
+						Комната квиза
+					</h1>
+					{session.room_code ? (
+						<div style={{
+							display: 'inline-block',
+							marginTop: '1rem',
+							padding: '1rem 2rem',
+							background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+							borderRadius: '12px',
+							color: 'white',
+							fontSize: '1.1rem',
+							fontWeight: 'bold',
+							boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+						}}>
+							<span style={{ opacity: 0.9, marginRight: '0.5rem' }}>Код комнаты:</span>
+							<span style={{ fontSize: '1.5rem', letterSpacing: '0.2em' }}>{session.room_code}</span>
+						</div>
+					) : null}
+				</div>
 
-				<div className="participants-section">
-					<h2 className="section__title">Участники</h2>
-					<p className="section__subtitle">
-						Подключено: <strong>{participants.length}</strong>
-					</p>
+				{/* Статус подключения */}
+				<div style={{
+					display: 'flex',
+					justifyContent: 'center',
+					gap: '1rem',
+					marginBottom: '2.5rem',
+					flexWrap: 'wrap',
+				}}>
+					<div style={{
+						padding: '0.75rem 1.5rem',
+						background: session.status === 'waiting' ? '#f0f9ff' : '#fef3c7',
+						borderRadius: '8px',
+						border: `2px solid ${session.status === 'waiting' ? '#3b82f6' : '#f59e0b'}`,
+					}}>
+						<span style={{
+							fontSize: '0.9rem',
+							color: '#666',
+							marginRight: '0.5rem',
+						}}>
+							Статус:
+						</span>
+						<strong style={{
+							color: session.status === 'waiting' ? '#3b82f6' : '#f59e0b',
+							fontSize: '1rem',
+						}}>
+							{session.status === 'waiting' ? '⏳ Ожидание' : '▶️ В процессе'}
+						</strong>
+					</div>
+					<div style={{
+						padding: '0.75rem 1.5rem',
+						background: socketStatus === 'joined' ? '#d1fae5' : '#fee2e2',
+						borderRadius: '8px',
+						border: `2px solid ${socketStatus === 'joined' ? '#10b981' : '#ef4444'}`,
+					}}>
+						<span style={{
+							fontSize: '0.9rem',
+							color: '#666',
+							marginRight: '0.5rem',
+						}}>
+							Подключение:
+						</span>
+						<strong style={{
+							color: socketStatus === 'joined' ? '#10b981' : '#ef4444',
+							fontSize: '1rem',
+						}}>
+							{socketStatus === 'joined' ? '✅ Подключено' : '🔄 Подключаемся...'}
+						</strong>
+					</div>
+				</div>
+
+				{/* Участники */}
+				<div style={{
+					background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+					padding: '2rem',
+					borderRadius: '16px',
+					marginBottom: '2rem',
+					boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+				}}>
+					<div style={{
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'space-between',
+						marginBottom: '1.5rem',
+					}}>
+						<h2 style={{
+							margin: 0,
+							fontSize: '1.8rem',
+							color: '#333',
+							fontWeight: 'bold',
+							display: 'flex',
+							alignItems: 'center',
+							gap: '0.5rem',
+						}}>
+							👥 Участники
+						</h2>
+						<div style={{
+							padding: '0.5rem 1rem',
+							background: 'white',
+							borderRadius: '20px',
+							fontSize: '1.1rem',
+							fontWeight: 'bold',
+							color: '#667eea',
+							boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+						}}>
+							{participants.length}
+						</div>
+					</div>
 					{participants.length > 0 ? (
-						<ul className="participants-list">
-							{participants.map((p, idx) => (
-								<li key={p.user_id || idx}>
-									{p.display_name}
-									{p.user_id === Number(user?.id ?? 0) ? ' (Вы)' : ''}
-								</li>
-							))}
-						</ul>
+						<div style={{
+							display: 'grid',
+							gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+							gap: '1rem',
+						}}>
+							{participants.map((p, idx) => {
+								const isCurrentUser = p.user_id === Number(user?.id ?? 0);
+								return (
+									<div
+										key={p.user_id || idx}
+										style={{
+											padding: '1rem 1.25rem',
+											background: isCurrentUser
+												? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+												: 'white',
+											borderRadius: '12px',
+											color: isCurrentUser ? 'white' : '#333',
+											fontWeight: isCurrentUser ? 'bold' : '500',
+											boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+											transition: 'transform 0.2s ease',
+											display: 'flex',
+											alignItems: 'center',
+											gap: '0.5rem',
+										}}
+										onMouseEnter={(e) => {
+											e.currentTarget.style.transform = 'translateY(-2px)';
+										}}
+										onMouseLeave={(e) => {
+											e.currentTarget.style.transform = 'translateY(0)';
+										}}
+									>
+										<span style={{ fontSize: '1.2rem' }}>
+											{isCurrentUser ? '👤' : '👥'}
+										</span>
+										<span>{p.display_name}</span>
+										{isCurrentUser && (
+											<span style={{
+												fontSize: '0.85rem',
+												opacity: 0.9,
+												marginLeft: 'auto',
+											}}>
+												(Вы)
+											</span>
+										)}
+									</div>
+								);
+							})}
+						</div>
 					) : (
-						<p className="section__subtitle">Пока нет участников</p>
+						<div style={{
+							textAlign: 'center',
+							padding: '2rem',
+							color: '#666',
+						}}>
+							<div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
+							<p style={{ margin: 0, fontSize: '1.1rem' }}>
+								Пока нет участников. Ожидаем подключения...
+							</p>
+						</div>
 					)}
 				</div>
 
+				{/* Действия создателя */}
 				{isCreator && socketStatus === 'joined' ? (
-					<div className="creator-actions">
+					<div style={{ textAlign: 'center' }}>
 						{participants.length > 0 ? (
 							<button
 								type="button"
 								className="primary-button"
 								onClick={handleStartQuiz}
 								disabled={isStarting || session.status !== 'waiting'}
+								style={{
+									padding: '1.25rem 3rem',
+									fontSize: '1.3rem',
+									fontWeight: 'bold',
+									background: isStarting || session.status !== 'waiting'
+										? '#999'
+										: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+									color: 'white',
+									border: 'none',
+									borderRadius: '12px',
+									cursor: isStarting || session.status !== 'waiting' ? 'not-allowed' : 'pointer',
+									boxShadow: isStarting || session.status !== 'waiting'
+										? 'none'
+										: '0 8px 24px rgba(102, 126, 234, 0.4)',
+									transition: 'all 0.3s ease',
+									minWidth: '250px',
+								}}
+								onMouseEnter={(e) => {
+									if (!isStarting && session.status === 'waiting') {
+										e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+										e.currentTarget.style.boxShadow = '0 12px 32px rgba(102, 126, 234, 0.5)';
+									}
+								}}
+								onMouseLeave={(e) => {
+									if (!isStarting && session.status === 'waiting') {
+										e.currentTarget.style.transform = 'translateY(0) scale(1)';
+										e.currentTarget.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.4)';
+									}
+								}}
 							>
 								{isStarting
-									? 'Запускаем квиз...'
+									? '⏳ Запускаем квиз...'
 									: session.status === 'waiting'
-										? 'Начать квиз'
-										: 'Квиз уже запущен'}
+										? '🚀 Начать квиз'
+										: '✅ Квиз уже запущен'}
 							</button>
 						) : (
-							<p className="section__subtitle">
-								Ожидаем участников...
-							</p>
+							<div style={{
+								padding: '2rem',
+								background: '#fef3c7',
+								borderRadius: '12px',
+								border: '2px solid #f59e0b',
+							}}>
+								<div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⏳</div>
+								<p style={{
+									margin: 0,
+									color: '#92400e',
+									fontSize: '1.1rem',
+									fontWeight: '500',
+								}}>
+									Ожидаем участников...
+								</p>
+							</div>
 						)}
 					</div>
-				) : isCreator ? (
-					<p className="section__subtitle">Подключаемся к комнате...</p>
 				) : (
-					<p className="section__subtitle">
-						Ожидаем начала квиза...
-					</p>
+					<div style={{
+						textAlign: 'center',
+						padding: '2rem',
+						background: 'linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%)',
+						borderRadius: '12px',
+						border: '2px solid #667eea',
+					}}>
+						<div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+							{socketStatus === 'joined' ? '⏸️' : '🔄'}
+						</div>
+						<p style={{
+							margin: 0,
+							color: '#667eea',
+							fontSize: '1.2rem',
+							fontWeight: 'bold',
+						}}>
+							{socketStatus === 'joined'
+								? 'Ожидаем начала квиза...'
+								: 'Подключаемся к комнате...'}
+						</p>
+					</div>
 				)}
 
-				{error ? <p className="error-text">{error}</p> : null}
+				{error ? (
+					<div style={{
+						marginTop: '2rem',
+						padding: '1rem',
+						background: '#fee2e2',
+						borderRadius: '8px',
+						border: '2px solid #ef4444',
+						color: '#991b1b',
+						textAlign: 'center',
+					}}>
+						<p className="error-text" style={{ margin: 0 }}>{error}</p>
+					</div>
+				) : null}
 			</section>
 		</main>
 	);
