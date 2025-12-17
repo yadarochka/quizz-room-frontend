@@ -198,8 +198,8 @@ export function QuizResultsPage() {
 						<XAxis dataKey="name" />
 						<YAxis domain={[0, 100]} />
 						<Tooltip
-							formatter={(value: number | undefined, name: string) => {
-								if (value === undefined) return ['', ''];
+							formatter={(value: number | undefined, name: string | undefined) => {
+								if (value === undefined || name === undefined) return ['', ''];
 								if (name === 'score') return [`${value}%`, 'Баллы'];
 								if (name === 'correct') {
 									const dataPoint = barChartData.find((d) => d.correct === value);
