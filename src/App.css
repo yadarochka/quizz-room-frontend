@@ -301,8 +301,9 @@
 }
 
 .create-main {
-  max-width: 900px;
+  max-width: 100%;
   margin: 24px 0 80px;
+  width: 100%;
 }
 
 .create-section {

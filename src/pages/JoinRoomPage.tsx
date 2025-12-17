@@ -96,7 +96,7 @@ export function JoinRoomPage() {
 
 	return (
 		<main className="section section--center">
-			<section className="auth-card">
+			<section className="auth-card" style={{ maxWidth: '100%', width: '100%' }}>
 				<h1 className="auth-title">Присоединиться к квизу</h1>
 				<p className="auth-subtitle">
 					Введите код комнаты, чтобы присоединиться к квизу.

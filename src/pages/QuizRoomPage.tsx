@@ -304,7 +304,7 @@ export function QuizRoomPage() {
 		return (
 			<main className="section section--center" style={{ padding: '2rem 1rem' }}>
 				<section className="auth-card" style={{
-					maxWidth: '800px',
+					maxWidth: '100%',
 					width: '100%',
 					padding: '2rem',
 					boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -490,7 +490,7 @@ export function QuizRoomPage() {
 	if (quizStarted && !currentQuestion) {
 		return (
 			<main className="section section--center">
-				<section className="auth-card">
+				<section className="auth-card" style={{ maxWidth: '100%', width: '100%' }}>
 					<h1 className="auth-title">Квиз начался</h1>
 					<p className="section__subtitle">Ожидаем следующий вопрос...</p>
 				</section>
@@ -502,7 +502,7 @@ export function QuizRoomPage() {
 	return (
 		<main className="section section--center" style={{ padding: '2rem 1rem', minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
 			<section className="auth-card" style={{
-				maxWidth: '900px',
+				maxWidth: '100%',
 				width: '100%',
 				padding: '3rem 2rem',
 				background: 'white',
