@@ -32,6 +32,10 @@ export function QuizRoomPage() {
 	} | null>(null);
 	const [quizStarted, setQuizStarted] = useState(false);
 	const [answeredQuestionId, setAnsweredQuestionId] = useState<number | null>(null);
+	const [timeLeft, setTimeLeft] = useState<number | null>(null);
+	const [answeredCount, setAnsweredCount] = useState(0);
+	const [totalParticipants, setTotalParticipants] = useState(0);
+	const timerIntervalRef = useRef<number | null>(null);
 	const socketRef = useRef<Socket | null>(null);
 	const sessionIdRef = useRef<number | null>(null);
 
@@ -51,6 +55,7 @@ export function QuizRoomPage() {
 				const sessionData = await getSessionByQuizId(Number(quizId));
 				setSession(sessionData);
 				setParticipants(sessionData.participants || []);
+				setTotalParticipants(sessionData.participants.length);
 				setIsCreator(sessionData.creator_id === Number(user?.id ?? 0));
 
 				// Подключаемся к комнате
@@ -71,6 +76,9 @@ export function QuizRoomPage() {
 		void loadSession();
 
 		return () => {
+			if (timerIntervalRef.current) {
+				clearInterval(timerIntervalRef.current);
+			}
 			socketRef.current?.disconnect();
 		};
 	}, [quizId, isAuthenticated, user, navigate]);
@@ -116,6 +124,7 @@ export function QuizRoomPage() {
 				try {
 					const sessionData = await getSessionByQuizId(Number(quizId));
 					setParticipants(sessionData.participants || []);
+					setTotalParticipants(sessionData.participants.length);
 				} catch {
 					// Игнорируем ошибки
 				}
@@ -129,9 +138,25 @@ export function QuizRoomPage() {
 				try {
 					const sessionData = await getSessionByQuizId(Number(quizId));
 					setParticipants(sessionData.participants || []);
+					setTotalParticipants(sessionData.participants.length);
 				} catch {
 					// Игнорируем ошибки
 				}
+			}
+		});
+
+		socket.on('participant_answered', (payload: {
+			display_name?: string;
+			answered?: boolean;
+			answered_count?: number;
+			total_participants?: number;
+		}) => {
+			// Обновляем счетчик ответивших из payload
+			if (payload.answered_count !== undefined) {
+				setAnsweredCount(payload.answered_count);
+			}
+			if (payload.total_participants !== undefined) {
+				setTotalParticipants(payload.total_participants);
 			}
 		});
 
@@ -237,10 +262,55 @@ export function QuizRoomPage() {
 
 	// Если квиз начался и есть текущий вопрос, показываем его
 	if (quizStarted && currentQuestion) {
+		const timeLeftDisplay = timeLeft !== null ? timeLeft : currentQuestion.time_limit;
+		const timePercentage = timeLeft !== null && currentQuestion.time_limit > 0
+			? (timeLeft / currentQuestion.time_limit) * 100
+			: 100;
+		
 		return (
 			<main className="section section--center">
 				<section className="auth-card">
-					<h1 className="auth-title">Вопрос {currentQuestion.question_number} из {currentQuestion.total_questions}</h1>
+					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+						<h1 className="auth-title" style={{ margin: 0 }}>
+							Вопрос {currentQuestion.question_number} из {currentQuestion.total_questions}
+						</h1>
+						<div style={{
+							background: timeLeftDisplay <= 10 ? '#ff4444' : timeLeftDisplay <= 30 ? '#ffaa00' : '#667eea',
+							color: 'white',
+							padding: '0.5rem 1rem',
+							borderRadius: '8px',
+							fontSize: '1.2rem',
+							fontWeight: 'bold',
+							minWidth: '80px',
+							textAlign: 'center',
+						}}>
+							{timeLeftDisplay}с
+						</div>
+					</div>
+					
+					{/* Прогресс-бар таймера */}
+					<div style={{
+						width: '100%',
+						height: '8px',
+						background: '#e0e0e0',
+						borderRadius: '4px',
+						marginBottom: '1rem',
+						overflow: 'hidden',
+					}}>
+						<div style={{
+							width: `${timePercentage}%`,
+							height: '100%',
+							background: timeLeftDisplay <= 10 ? '#ff4444' : timeLeftDisplay <= 30 ? '#ffaa00' : '#667eea',
+							transition: 'width 1s linear, background 0.3s',
+						}} />
+					</div>
+					
+					{totalParticipants > 0 && (
+						<p className="section__subtitle" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
+							Ответили: {answeredCount} / {totalParticipants}
+						</p>
+					)}
+					
 					<p className="section__subtitle" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
 						{currentQuestion.question_text}
 					</p>
