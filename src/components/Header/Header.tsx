@@ -52,8 +52,8 @@ export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
 						<Link to="/home" onClick={handleNavClick}>
 							Мои квизы
 						</Link>
-						<Link to="/active" onClick={handleNavClick}>
-							Активные квизы
+						<Link to="/completed" onClick={handleNavClick}>
+							Проведенные квизы
 						</Link>
 					</>
 				) : (

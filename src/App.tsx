@@ -5,7 +5,7 @@ import { useAuth } from './auth/AuthContext';
 import { Header } from './components/Header';
 import { Loader } from './components/Loader';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
-import { ActiveQuizzesPage } from './pages/ActiveQuizzesPage';
+import { CompletedQuizzesPage } from './pages/CompletedQuizzesPage';
 import { CreateQuizPage } from './pages/CreateQuizPage';
 import { HomePage } from './pages/HomePage';
 import { JoinRoomPage } from './pages/JoinRoomPage';
@@ -77,10 +77,10 @@ function App() {
 					}
 				/>
 				<Route
-					path="/active"
+					path="/completed"
 					element={
 						isAuthenticated ? (
-							<ActiveQuizzesPage />
+							<CompletedQuizzesPage />
 						) : (
 							<Navigate to="/login" replace />
 						)

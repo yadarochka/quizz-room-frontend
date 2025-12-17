@@ -182,4 +182,36 @@ export async function generateQuestions(
 	});
 }
 
+export type CompletedQuiz = {
+	session_id: number;
+	quiz_id: number;
+	quiz_title: string;
+	creator_id: number;
+	creator_name: string;
+	creator_email: string | null;
+	question_count: number;
+	participant_count: number;
+	created_at: string;
+	ended_at: string;
+};
+
+export type CompletedQuizzesResponse = {
+	data: CompletedQuiz[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export async function getCompletedQuizzes(
+	page: number = 1,
+	limit: number = 20,
+): Promise<CompletedQuizzesResponse> {
+	return apiRequest<CompletedQuizzesResponse>(
+		`/api/quizzes/completed?page=${page}&limit=${limit}`,
+		{
+			method: 'GET',
+		},
+	);
+}
+
 

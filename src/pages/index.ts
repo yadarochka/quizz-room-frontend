@@ -6,7 +6,7 @@ export { NotFoundPage } from './NotFoundPage';
 export { CreateQuizPage } from './CreateQuizPage';
 export { JoinRoomPage } from './JoinRoomPage';
 export { QuizRoomPage } from './QuizRoomPage';
-export { ActiveQuizzesPage } from './ActiveQuizzesPage';
+export { CompletedQuizzesPage } from './CompletedQuizzesPage';
 export { QuizResultsPage } from './QuizResultsPage';
 
 
