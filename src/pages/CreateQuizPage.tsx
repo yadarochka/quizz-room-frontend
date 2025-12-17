@@ -38,7 +38,7 @@ export function CreateQuizPage() {
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [aiTopic, setAiTopic] = useState('');
 	const [questionCount, setQuestionCount] = useState(5);
-	const aiProvider: 'groq' = 'groq';
+	const [aiProvider, setAiProvider] = useState<'groq' | 'openrouter'>('groq');
 
 	const handleChangeQuestion = (id: number, value: string) => {
 		setQuestions((prev) =>
@@ -292,21 +292,29 @@ export function CreateQuizPage() {
 								Генерация вопросов с помощью ИИ
 							</h3>
 						</div>
-						<div style={{ marginBottom: '1rem' }}>
-							<span className="field__label" style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-								Нейросеть
+						<label className="field" style={{ marginBottom: '1rem' }}>
+							<span className="field__label" style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem' }}>
+								Выберите нейросеть
 							</span>
-							<div style={{ 
-								padding: '0.875rem 1rem',
-								background: 'white',
-								borderRadius: '8px',
-								fontSize: '1rem',
-								color: '#667eea',
-								fontWeight: '600',
-							}}>
-								Groq (Llama 3.1) - Бесплатно, быстро
-							</div>
-						</div>
+							<select
+								className="field__input"
+								value={aiProvider}
+								onChange={(e) => setAiProvider(e.target.value as typeof aiProvider)}
+								disabled={isGenerating}
+								style={{
+									background: 'white',
+									padding: '0.875rem 1rem',
+									fontSize: '1rem',
+									border: 'none',
+									borderRadius: '8px',
+									cursor: isGenerating ? 'not-allowed' : 'pointer',
+									width: '100%',
+								}}
+							>
+								<option value="groq">Groq (Llama 3.1) - Бесплатно, быстро</option>
+								<option value="openrouter">OpenRouter.ai (GPT-3.5) - Платно</option>
+							</select>
+						</label>
 						<div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
 							<label className="field" style={{ flex: '1 1 300px', margin: 0 }}>
 								<span className="field__label" style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem' }}>
