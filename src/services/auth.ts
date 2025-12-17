@@ -15,7 +15,7 @@ export type AuthResponse = {
 export const LOCAL_STORAGE_TOKEN_KEY = 'quizz-room-token';
 
 export function getAuthRedirectUrl(): string {
-	const redirectUri = `${window.location.origin}/auth/callback`;
+	const redirectUri = `${window.location.origin}/auth/yandex/callback`;
 	const url = new URL('/auth/yandex', API_URL);
 	url.searchParams.set('redirect_uri', redirectUri);
 	return url.toString();

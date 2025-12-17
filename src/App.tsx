@@ -30,6 +30,7 @@ function App() {
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/auth/callback" element={<AuthCallbackPage />} />
+				<Route path="/auth/yandex/callback" element={<AuthCallbackPage />} />
 				<Route
 					path="/home"
 					element={
