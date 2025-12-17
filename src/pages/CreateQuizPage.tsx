@@ -227,18 +227,24 @@ export function CreateQuizPage() {
 					{/* AI Generation Section */}
 					<div style={{
 						background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-						padding: '1.5rem',
-						borderRadius: '12px',
+						padding: '2rem',
+						borderRadius: '16px',
 						marginBottom: '2rem',
+						marginTop: '1rem',
 						color: 'white',
+						boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
+						border: '2px solid rgba(255, 255, 255, 0.2)',
 					}}>
-						<h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem' }}>
-							🤖 Генерация вопросов с помощью ИИ
-						</h3>
-						<div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
-							<label className="field" style={{ flex: 1, margin: 0 }}>
-								<span className="field__label" style={{ color: 'white' }}>
-									Тема квиза
+						<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+							<span style={{ fontSize: '2rem' }}>🤖</span>
+							<h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>
+								Генерация вопросов с помощью ИИ
+							</h3>
+						</div>
+						<div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+							<label className="field" style={{ flex: '1 1 300px', margin: 0 }}>
+								<span className="field__label" style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem' }}>
+									Введите тему квиза
 								</span>
 								<input
 									type="text"
@@ -247,7 +253,19 @@ export function CreateQuizPage() {
 									value={aiTopic}
 									onChange={(event) => setAiTopic(event.target.value)}
 									disabled={isGenerating}
-									style={{ background: 'white' }}
+									style={{
+										background: 'white',
+										padding: '0.875rem 1rem',
+										fontSize: '1rem',
+										border: 'none',
+										borderRadius: '8px',
+									}}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' && aiTopic.trim() && !isGenerating) {
+											e.preventDefault();
+											handleGenerateQuestions();
+										}
+									}}
 								/>
 							</label>
 							<button
@@ -259,19 +277,43 @@ export function CreateQuizPage() {
 									background: isGenerating || !aiTopic.trim() ? '#999' : 'white',
 									color: isGenerating || !aiTopic.trim() ? '#ccc' : '#667eea',
 									border: 'none',
-									padding: '0.75rem 1.5rem',
+									padding: '0.875rem 2rem',
 									borderRadius: '8px',
 									cursor: isGenerating || !aiTopic.trim() ? 'not-allowed' : 'pointer',
 									fontWeight: 'bold',
+									fontSize: '1rem',
 									whiteSpace: 'nowrap',
+									boxShadow: isGenerating || !aiTopic.trim() ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.15)',
+									transition: 'all 0.3s ease',
+									minWidth: '200px',
+								}}
+								onMouseEnter={(e) => {
+									if (!isGenerating && aiTopic.trim()) {
+										e.currentTarget.style.transform = 'translateY(-2px)';
+										e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)';
+									}
+								}}
+								onMouseLeave={(e) => {
+									if (!isGenerating && aiTopic.trim()) {
+										e.currentTarget.style.transform = 'translateY(0)';
+										e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+									}
 								}}
 							>
 								{isGenerating ? '⏳ Генерируем...' : '✨ Сгенерировать вопросы'}
 							</button>
 						</div>
-						<p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-							ИИ создаст 5 вопросов с вариантами ответов по указанной теме
-						</p>
+						<div style={{
+							marginTop: '1rem',
+							padding: '0.75rem 1rem',
+							background: 'rgba(255, 255, 255, 0.15)',
+							borderRadius: '8px',
+						}}>
+							<p style={{ margin: 0, fontSize: '0.95rem', opacity: 0.95, lineHeight: '1.5' }}>
+								💡 <strong>ИИ автоматически создаст 5 вопросов</strong> с 4 вариантами ответов каждый по указанной теме. 
+								Вопросы будут добавлены в список ниже, и вы сможете их отредактировать.
+							</p>
+						</div>
 					</div>
 
 					<div className="questions-block">
