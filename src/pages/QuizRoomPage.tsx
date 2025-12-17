@@ -181,9 +181,34 @@ export function QuizRoomPage() {
 			question_number: number;
 			total_questions: number;
 		}) => {
+			// Очищаем предыдущий интервал
+			if (timerIntervalRef.current) {
+				clearInterval(timerIntervalRef.current);
+				timerIntervalRef.current = null;
+			}
+			
 			setCurrentQuestion(payload);
 			setQuizStarted(true);
 			setAnsweredQuestionId(null); // Сбрасываем флаг ответа для нового вопроса
+			setTimeLeft(payload.time_limit); // Устанавливаем таймер
+			setAnsweredCount(0); // Сбрасываем счетчик ответов
+			
+			// Запускаем таймер
+			let remaining = payload.time_limit;
+			setTimeLeft(remaining);
+			
+			timerIntervalRef.current = window.setInterval(() => {
+				remaining -= 1;
+				if (remaining >= 0) {
+					setTimeLeft(remaining);
+				}
+				if (remaining <= 0) {
+					if (timerIntervalRef.current) {
+						clearInterval(timerIntervalRef.current);
+						timerIntervalRef.current = null;
+					}
+				}
+			}, 1000);
 		});
 
 		socket.on('question_timeout', () => {
@@ -267,60 +292,117 @@ export function QuizRoomPage() {
 
 	// Если квиз начался и есть текущий вопрос, показываем его
 	if (quizStarted && currentQuestion) {
-		const timeLeftDisplay = timeLeft !== null ? timeLeft : currentQuestion.time_limit;
+		const timeLeftDisplay = timeLeft !== null ? Math.max(0, timeLeft) : currentQuestion.time_limit;
 		const timePercentage = timeLeft !== null && currentQuestion.time_limit > 0
-			? (timeLeft / currentQuestion.time_limit) * 100
+			? Math.max(0, Math.min(100, (timeLeft / currentQuestion.time_limit) * 100))
 			: 100;
 		
+		const timerColor = timeLeftDisplay <= 10 ? '#ff4444' : timeLeftDisplay <= 30 ? '#ffaa00' : '#667eea';
+		
 		return (
-			<main className="section section--center">
-				<section className="auth-card">
-					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-						<h1 className="auth-title" style={{ margin: 0 }}>
-							Вопрос {currentQuestion.question_number} из {currentQuestion.total_questions}
-						</h1>
+			<main className="section section--center" style={{ padding: '2rem 1rem' }}>
+				<section className="auth-card" style={{
+					maxWidth: '800px',
+					width: '100%',
+					padding: '2rem',
+					boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+				}}>
+					{/* Заголовок с таймером */}
+					<div style={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						marginBottom: '1.5rem',
+						flexWrap: 'wrap',
+						gap: '1rem',
+					}}>
+						<div>
+							<h1 className="auth-title" style={{
+								margin: 0,
+								fontSize: '1.8rem',
+								background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+								WebkitBackgroundClip: 'text',
+								WebkitTextFillColor: 'transparent',
+							}}>
+								Вопрос {currentQuestion.question_number} из {currentQuestion.total_questions}
+							</h1>
+						</div>
 						<div style={{
-							background: timeLeftDisplay <= 10 ? '#ff4444' : timeLeftDisplay <= 30 ? '#ffaa00' : '#667eea',
+							background: timerColor,
 							color: 'white',
-							padding: '0.5rem 1rem',
-							borderRadius: '8px',
-							fontSize: '1.2rem',
+							padding: '0.75rem 1.5rem',
+							borderRadius: '12px',
+							fontSize: '1.5rem',
 							fontWeight: 'bold',
-							minWidth: '80px',
+							minWidth: '100px',
 							textAlign: 'center',
+							boxShadow: `0 4px 12px ${timerColor}40`,
+							transition: 'all 0.3s ease',
+							animation: timeLeftDisplay <= 10 ? 'pulse 1s infinite' : undefined,
 						}}>
-							{timeLeftDisplay}с
+							⏱ {timeLeftDisplay}с
 						</div>
 					</div>
 					
 					{/* Прогресс-бар таймера */}
 					<div style={{
 						width: '100%',
-						height: '8px',
-						background: '#e0e0e0',
-						borderRadius: '4px',
-						marginBottom: '1rem',
+						height: '12px',
+						background: '#e8e8e8',
+						borderRadius: '6px',
+						marginBottom: '1.5rem',
 						overflow: 'hidden',
+						boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
 					}}>
 						<div style={{
 							width: `${timePercentage}%`,
 							height: '100%',
-							background: timeLeftDisplay <= 10 ? '#ff4444' : timeLeftDisplay <= 30 ? '#ffaa00' : '#667eea',
+							background: `linear-gradient(90deg, ${timerColor} 0%, ${timerColor}dd 100%)`,
 							transition: 'width 1s linear, background 0.3s',
+							borderRadius: '6px',
 						}} />
 					</div>
 					
+					{/* Счетчик ответивших */}
 					{totalParticipants > 0 && (
-						<p className="section__subtitle" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
-							Ответили: {answeredCount} / {totalParticipants}
-						</p>
+						<div style={{
+							background: '#f5f5f5',
+							padding: '0.75rem 1rem',
+							borderRadius: '8px',
+							marginBottom: '1.5rem',
+							textAlign: 'center',
+						}}>
+							<p style={{
+								margin: 0,
+								fontSize: '1rem',
+								color: '#666',
+								fontWeight: '500',
+							}}>
+								👥 Ответили: <strong style={{ color: '#667eea' }}>{answeredCount}</strong> / <strong>{totalParticipants}</strong>
+							</p>
+						</div>
 					)}
 					
-					<p className="section__subtitle" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
-						{currentQuestion.question_text}
-					</p>
-					<div className="answers-list">
-						{currentQuestion.answers.map((answer) => {
+					{/* Текст вопроса */}
+					<div style={{
+						background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+						padding: '2rem',
+						borderRadius: '12px',
+						marginBottom: '2rem',
+						boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+					}}>
+						<p style={{
+							margin: 0,
+							fontSize: '1.4rem',
+							lineHeight: '1.6',
+							color: '#333',
+							fontWeight: '500',
+						}}>
+							{currentQuestion.question_text}
+						</p>
+					</div>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+						{currentQuestion.answers.map((answer, index) => {
 							const isAnswered = answeredQuestionId === currentQuestion.question_id;
 							return (
 								<button
@@ -328,12 +410,35 @@ export function QuizRoomPage() {
 									type="button"
 									className="primary-button"
 									style={{
-										marginBottom: '1rem',
-										width: '100%',
-										opacity: isAnswered ? 0.6 : 1,
+										padding: '1.25rem 1.5rem',
+										fontSize: '1.1rem',
+										borderRadius: '12px',
+										border: 'none',
+										background: isAnswered
+											? '#e0e0e0'
+											: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+										color: isAnswered ? '#999' : 'white',
 										cursor: isAnswered ? 'not-allowed' : 'pointer',
+										transition: 'all 0.3s ease',
+										boxShadow: isAnswered
+											? 'none'
+											: '0 4px 12px rgba(102, 126, 234, 0.4)',
+										transform: isAnswered ? 'none' : 'translateY(0)',
+										opacity: isAnswered ? 0.7 : 1,
 									}}
 									disabled={isAnswered}
+									onMouseEnter={(e) => {
+										if (!isAnswered) {
+											e.currentTarget.style.transform = 'translateY(-2px)';
+											e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.5)';
+										}
+									}}
+									onMouseLeave={(e) => {
+										if (!isAnswered) {
+											e.currentTarget.style.transform = 'translateY(0)';
+											e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+										}
+									}}
 									onClick={() => {
 										// Отправляем ответ
 										if (socketRef.current && sessionIdRef.current && !isAnswered) {
@@ -345,15 +450,31 @@ export function QuizRoomPage() {
 										}
 									}}
 								>
+									<span style={{ marginRight: '0.5rem' }}>
+										{String.fromCharCode(65 + index)}.
+									</span>
 									{answer.text}
 								</button>
 							);
 						})}
 					</div>
 					{answeredQuestionId === currentQuestion.question_id ? (
-						<p className="section__subtitle" style={{ color: 'green' }}>
-							Ответ отправлен! Ожидаем результатов...
-						</p>
+						<div style={{
+							background: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)',
+							padding: '1rem',
+							borderRadius: '8px',
+							marginTop: '1.5rem',
+							textAlign: 'center',
+						}}>
+							<p style={{
+								margin: 0,
+								color: 'white',
+								fontSize: '1.1rem',
+								fontWeight: 'bold',
+							}}>
+								✓ Ответ отправлен! Ожидаем результатов...
+							</p>
+						</div>
 					) : null}
 					<p className="section__subtitle">
 						Время на ответ: {currentQuestion.time_limit} сек
