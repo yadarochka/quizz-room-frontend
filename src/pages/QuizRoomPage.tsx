@@ -51,7 +51,7 @@ export function QuizRoomPage() {
 				const sessionData = await getSessionByQuizId(Number(quizId));
 				setSession(sessionData);
 				setParticipants(sessionData.participants || []);
-				setIsCreator(sessionData.creator_id === user?.id);
+				setIsCreator(sessionData.creator_id === Number(user?.id ?? 0));
 
 				// Подключаемся к комнате
 				if (sessionData.room_code) {
@@ -135,10 +135,7 @@ export function QuizRoomPage() {
 			}
 		});
 
-		socket.on('quiz_started', (payload: {
-			current_question?: number;
-			total_questions?: number;
-		}) => {
+		socket.on('quiz_started', () => {
 			setQuizStarted(true);
 			setIsStarting(false);
 			// Обновляем статус сессии
@@ -330,7 +327,7 @@ export function QuizRoomPage() {
 							{participants.map((p, idx) => (
 								<li key={p.user_id || idx}>
 									{p.display_name}
-									{p.user_id === user?.id ? ' (Вы)' : ''}
+									{p.user_id === Number(user?.id ?? 0) ? ' (Вы)' : ''}
 								</li>
 							))}
 						</ul>

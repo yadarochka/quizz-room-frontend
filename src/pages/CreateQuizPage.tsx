@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
 	createQuiz,
 	createSession,
-	type CreatedQuiz,
 } from '../services/quizzes';
 import type { Question } from '../types/quiz';
 
@@ -172,7 +171,7 @@ export function CreateQuizPage() {
 		try {
 			const quiz = await createQuiz(payload);
 
-			const session = await createSession(quiz.id);
+			await createSession(quiz.id);
 
 			// Редиректим на страницу комнаты
 			navigate(`/quizzes/${quiz.id}`, { replace: true });

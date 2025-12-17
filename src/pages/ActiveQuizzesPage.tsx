@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
 import {
 	getMyQuizzes,
 	getSessionByQuizId,
@@ -10,7 +9,6 @@ import {
 
 export function ActiveQuizzesPage() {
 	const navigate = useNavigate();
-	const { user } = useAuth();
 	const [quizzes, setQuizzes] = useState<QuizListItem[]>([]);
 	const [activeSessions, setActiveSessions] = useState<
 		Map<number, SessionInfoWithCreator>
