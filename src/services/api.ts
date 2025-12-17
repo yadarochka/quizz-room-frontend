@@ -2,8 +2,9 @@
 // По умолчанию используется production URL (fallback)
 const DEFAULT_API_URL = 'https://quizz-room-server.netlify.app';
 
-export const API_URL =
-	import.meta.env.VITE_API_URL ?? DEFAULT_API_URL;
+const API_URL_RAW = import.meta.env.VITE_API_URL ?? DEFAULT_API_URL;
+// убираем завершающий слеш, чтобы не было //auth в запросах
+export const API_URL = API_URL_RAW.replace(/\/+$/, '');
 
 export async function apiRequest<TResponse>(
 	path: string,

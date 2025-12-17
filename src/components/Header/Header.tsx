@@ -49,3 +49,4 @@ export function Header({ isNavOpen, setIsNavOpen, onLogoClick }: HeaderProps) {
 	);
 }
 
+
