@@ -152,7 +152,7 @@ export async function getSessionResults(
 	return apiRequest<SessionResults>(`/api/sessions/${sessionId}/results`);
 }
 
-export type AIProvider = 'groq' | 'openai' | 'gemini' | 'deepseek';
+export type AIProvider = 'groq' | 'gemini';
 
 export type GenerateQuestionsPayload = {
 	topic: string;

@@ -38,7 +38,7 @@ export function CreateQuizPage() {
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [aiTopic, setAiTopic] = useState('');
 	const [questionCount, setQuestionCount] = useState(5);
-	const [aiProvider, setAiProvider] = useState<'groq' | 'openai' | 'gemini' | 'deepseek'>('groq');
+	const [aiProvider, setAiProvider] = useState<'groq' | 'gemini'>('groq');
 
 	const handleChangeQuestion = (id: number, value: string) => {
 		setQuestions((prev) =>
@@ -312,9 +312,7 @@ export function CreateQuizPage() {
 								}}
 							>
 								<option value="groq">Groq (Llama 3.1) - Бесплатно, быстро</option>
-								<option value="openai">OpenAI (GPT-3.5) - Платно</option>
-								<option value="gemini">Google Gemini - Бесплатный tier</option>
-								<option value="deepseek">DeepSeek - Бесплатный tier</option>
+								<option value="gemini">Google Gemini - Бесплатно</option>
 							</select>
 						</label>
 						<div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
