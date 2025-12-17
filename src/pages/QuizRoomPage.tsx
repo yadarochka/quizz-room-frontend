@@ -35,6 +35,7 @@ export function QuizRoomPage() {
 	const [timeLeft, setTimeLeft] = useState<number | null>(null);
 	const [answeredCount, setAnsweredCount] = useState(0);
 	const [totalParticipants, setTotalParticipants] = useState(0);
+	const [copiedCode, setCopiedCode] = useState(false);
 	const timerIntervalRef = useRef<number | null>(null);
 	const socketRef = useRef<Socket | null>(null);
 	const sessionIdRef = useRef<number | null>(null);
@@ -527,19 +528,81 @@ export function QuizRoomPage() {
 						Комната квиза
 					</h1>
 					{session.room_code ? (
-						<div style={{
-							display: 'inline-block',
-							marginTop: '1rem',
-							padding: '1rem 2rem',
-							background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-							borderRadius: '12px',
-							color: 'white',
-							fontSize: '1.1rem',
-							fontWeight: 'bold',
-							boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
-						}}>
-							<span style={{ opacity: 0.9, marginRight: '0.5rem' }}>Код комнаты:</span>
-							<span style={{ fontSize: '1.5rem', letterSpacing: '0.2em' }}>{session.room_code}</span>
+						<div style={{ marginTop: '1rem', position: 'relative' }}>
+							<div
+								onClick={async () => {
+									try {
+										await navigator.clipboard.writeText(session.room_code);
+										setCopiedCode(true);
+										setTimeout(() => setCopiedCode(false), 2000);
+									} catch (err) {
+										// Fallback для старых браузеров
+										const textArea = document.createElement('textarea');
+										textArea.value = session.room_code;
+										textArea.style.position = 'fixed';
+										textArea.style.opacity = '0';
+										document.body.appendChild(textArea);
+										textArea.select();
+										try {
+											document.execCommand('copy');
+											setCopiedCode(true);
+											setTimeout(() => setCopiedCode(false), 2000);
+										} catch {
+											// Игнорируем ошибки
+										}
+										document.body.removeChild(textArea);
+									}
+								}}
+								style={{
+									display: 'inline-block',
+									padding: '1rem 2rem',
+									background: copiedCode
+										? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+										: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+									borderRadius: '12px',
+									color: 'white',
+									fontSize: '1.1rem',
+									fontWeight: 'bold',
+									boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+									cursor: 'pointer',
+									transition: 'all 0.3s ease',
+									userSelect: 'none',
+								}}
+								onMouseEnter={(e) => {
+									if (!copiedCode) {
+										e.currentTarget.style.transform = 'scale(1.05)';
+										e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.5)';
+									}
+								}}
+								onMouseLeave={(e) => {
+									if (!copiedCode) {
+										e.currentTarget.style.transform = 'scale(1)';
+										e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+									}
+								}}
+							>
+								<span style={{ opacity: 0.9, marginRight: '0.5rem' }}>
+									{copiedCode ? '✓ Скопировано!' : 'Код комнаты:'}
+								</span>
+								<span style={{ fontSize: '1.5rem', letterSpacing: '0.2em' }}>
+									{session.room_code}
+								</span>
+							</div>
+							{!copiedCode && (
+								<div style={{
+									position: 'absolute',
+									top: '100%',
+									left: '50%',
+									transform: 'translateX(-50%)',
+									marginTop: '0.5rem',
+									fontSize: '0.85rem',
+									color: 'white',
+									opacity: 0.8,
+									whiteSpace: 'nowrap',
+								}}>
+									👆 Нажмите, чтобы скопировать
+								</div>
+							)}
 						</div>
 					) : null}
 				</div>
