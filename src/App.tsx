@@ -6,6 +6,7 @@ import { Header } from './components/Header';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { CreateQuizPage } from './pages/CreateQuizPage';
 import { HomePage } from './pages/HomePage';
+import { JoinRoomPage } from './pages/JoinRoomPage';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -46,6 +47,16 @@ function App() {
 					element={
 						isAuthenticated ? (
 							<CreateQuizPage />
+						) : (
+							<Navigate to="/login" replace />
+						)
+					}
+				/>
+				<Route
+					path="/join"
+					element={
+						isAuthenticated ? (
+							<JoinRoomPage />
 						) : (
 							<Navigate to="/login" replace />
 						)

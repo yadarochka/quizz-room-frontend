@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 export function LandingPage() {
 	const navigate = useNavigate();
+	const { isAuthenticated } = useAuth();
 
 	return (
 		<main>
@@ -25,7 +27,9 @@ export function LandingPage() {
 						</button>
 						<button
 							className="secondary-button hero__secondary"
-							onClick={() => navigate('/login')}
+							onClick={() =>
+								navigate(isAuthenticated ? '/join' : '/login')
+							}
 						>
 							Присоединиться к квизу
 						</button>
