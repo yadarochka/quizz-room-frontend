@@ -106,12 +106,36 @@ export async function getMyQuizzes(
 	);
 }
 
+export type ParticipantAnswer = {
+	question_id: number;
+	question_text: string;
+	question_order: number;
+	selected_answer_id: number | null;
+	selected_answer_text: string | null;
+	correct_answer_text: string | null;
+	is_correct: boolean;
+};
+
 export type SessionResultParticipant = {
 	user_id: number;
 	display_name: string;
 	correct_answers: number;
 	total_questions: number;
 	score: number;
+	answers?: ParticipantAnswer[];
+};
+
+export type QuestionAnswer = {
+	id: number;
+	text: string;
+	is_correct: boolean;
+};
+
+export type QuestionDetail = {
+	id: number;
+	text: string;
+	order: number;
+	answers: QuestionAnswer[];
 };
 
 export type SessionResults = {
@@ -119,6 +143,7 @@ export type SessionResults = {
 	quiz_title: string;
 	total_questions: number;
 	participants: SessionResultParticipant[];
+	questions?: QuestionDetail[];
 };
 
 export async function getSessionResults(
