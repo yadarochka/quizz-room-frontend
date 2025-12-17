@@ -196,7 +196,7 @@ export function QuizRoomPage() {
 			}
 		});
 
-		socket.on('quiz_finished', (payload: { results?: unknown }) => {
+		socket.on('quiz_finished', () => {
 			// Квиз завершен, переходим на страницу результатов
 			if (sessionIdRef.current) {
 				navigate(`/results/${sessionIdRef.current}`, { replace: true });
