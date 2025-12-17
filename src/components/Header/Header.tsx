@@ -1,26 +1,38 @@
 import { type Dispatch, type SetStateAction } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 import './Header.css';
 
 type HeaderProps = {
 	isNavOpen: boolean;
 	setIsNavOpen: Dispatch<SetStateAction<boolean>>;
-	onLogoClick?: () => void;
 };
 
-export function Header({ isNavOpen, setIsNavOpen, onLogoClick }: HeaderProps) {
-	const logoClassName = [
-		'header__logo',
-		onLogoClick ? 'header__logo--clickable' : '',
-	]
-		.filter(Boolean)
-		.join(' ');
+export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
+	const navigate = useNavigate();
+	const { isAuthenticated } = useAuth();
+
+	const handleLogoClick = () => {
+		navigate('/');
+		setIsNavOpen(false);
+	};
+
+	const handleNavClick = () => {
+		setIsNavOpen(false);
+	};
 
 	return (
 		<header className="header">
 			<div
-				className={logoClassName}
-				onClick={onLogoClick}
-				role={onLogoClick ? 'button' : undefined}
+				className="header__logo header__logo--clickable"
+				onClick={handleLogoClick}
+				role="button"
+				tabIndex={0}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						handleLogoClick();
+					}
+				}}
 			>
 				QuizzRoom
 			</div>
@@ -29,10 +41,26 @@ export function Header({ isNavOpen, setIsNavOpen, onLogoClick }: HeaderProps) {
 					isNavOpen ? 'header__nav--open' : ''
 				}`}
 			>
-				<a href="#about">О компании</a>
-				<a href="#news">Новости</a>
-				<a href="#help">Помощь</a>
-				<a href="#contacts">Контакты</a>
+				{isAuthenticated ? (
+					<>
+						<Link to="/quizzes/create" onClick={handleNavClick}>
+							Создать квиз
+						</Link>
+						<Link to="/join" onClick={handleNavClick}>
+							Присоединиться к квизу
+						</Link>
+						<Link to="/home" onClick={handleNavClick}>
+							Мои квизы
+						</Link>
+						<Link to="/active" onClick={handleNavClick}>
+							Активные квизы
+						</Link>
+					</>
+				) : (
+					<Link to="/login" onClick={handleNavClick}>
+						Войти
+					</Link>
+				)}
 			</nav>
 			<button
 				type="button"
