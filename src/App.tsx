@@ -10,6 +10,7 @@ import { JoinRoomPage } from './pages/JoinRoomPage';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { QuizRoomPage } from './pages/QuizRoomPage';
 
 function App() {
 	const [isNavOpen, setIsNavOpen] = useState(false);
@@ -57,6 +58,16 @@ function App() {
 					element={
 						isAuthenticated ? (
 							<JoinRoomPage />
+						) : (
+							<Navigate to="/login" replace />
+						)
+					}
+				/>
+				<Route
+					path="/quizzes/:quizId"
+					element={
+						isAuthenticated ? (
+							<QuizRoomPage />
 						) : (
 							<Navigate to="/login" replace />
 						)

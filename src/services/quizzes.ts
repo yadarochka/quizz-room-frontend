@@ -71,4 +71,14 @@ export async function getSession(
 	return apiRequest<SessionInfo>(`/api/sessions/${sessionId}`);
 }
 
+export type SessionInfoWithCreator = SessionInfo & {
+	creator_id: number;
+};
+
+export async function getSessionByQuizId(
+	quizId: number,
+): Promise<SessionInfoWithCreator> {
+	return apiRequest<SessionInfoWithCreator>(`/api/sessions/quiz/${quizId}`);
+}
+
 

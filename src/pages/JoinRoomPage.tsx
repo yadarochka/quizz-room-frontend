@@ -58,11 +58,16 @@ export function JoinRoomPage() {
 			});
 		});
 
-		socket.on('room_joined', () => {
+		socket.on('room_joined', (payload: {
+			session_id?: number;
+			quiz_id?: number;
+		}) => {
 			setSocketStatus('joined');
 			setIsJoining(false);
-			// TODO: Переход на страницу ожидания/игры
-			// Можно сохранить session_id в state или localStorage
+			// Редиректим на страницу комнаты
+			if (payload.quiz_id) {
+				navigate(`/quizzes/${payload.quiz_id}`, { replace: true });
+			}
 		});
 
 		socket.on('room_join_error', (payload: { error?: string }) => {
