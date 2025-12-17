@@ -22,6 +22,16 @@ export function QuizRoomPage() {
 		'idle' | 'connecting' | 'joined' | 'error'
 	>('idle');
 	const [isStarting, setIsStarting] = useState(false);
+	const [currentQuestion, setCurrentQuestion] = useState<{
+		question_id: number;
+		question_text: string;
+		answers: Array<{ id: number; text: string }>;
+		time_limit: number;
+		question_number: number;
+		total_questions: number;
+	} | null>(null);
+	const [quizStarted, setQuizStarted] = useState(false);
+	const [answeredQuestionId, setAnsweredQuestionId] = useState<number | null>(null);
 	const socketRef = useRef<Socket | null>(null);
 	const sessionIdRef = useRef<number | null>(null);
 
@@ -125,9 +135,54 @@ export function QuizRoomPage() {
 			}
 		});
 
-		socket.on('quiz_started', () => {
-			// Квиз начался, можно перейти на страницу игры
-			// TODO: Переход на страницу игры
+		socket.on('quiz_started', (payload: {
+			current_question?: number;
+			total_questions?: number;
+		}) => {
+			setQuizStarted(true);
+			setIsStarting(false);
+			// Обновляем статус сессии
+			getSessionByQuizId(Number(quizId))
+				.then((sessionData) => {
+					setSession(sessionData);
+				})
+				.catch(() => {
+					// Игнорируем ошибки
+				});
+		});
+
+		socket.on('next_question', (payload: {
+			question_id: number;
+			question_text: string;
+			answers: Array<{ id: number; text: string }>;
+			time_limit: number;
+			question_number: number;
+			total_questions: number;
+		}) => {
+			setCurrentQuestion(payload);
+			setQuizStarted(true);
+			setAnsweredQuestionId(null); // Сбрасываем флаг ответа для нового вопроса
+		});
+
+		socket.on('question_timeout', () => {
+			// Время на вопрос истекло, показываем результаты
+			setCurrentQuestion(null);
+		});
+
+		socket.on('quiz_finished', () => {
+			// Квиз завершен
+			setQuizStarted(false);
+			setCurrentQuestion(null);
+			setAnsweredQuestionId(null);
+		});
+
+		socket.on('answer_submitted', () => {
+			// Ответ отправлен успешно
+			// Можно показать подтверждение
+		});
+
+		socket.on('answer_error', (payload: { error?: string }) => {
+			setError(payload?.error || 'Ошибка при отправке ответа');
 		});
 
 		socket.on('quiz_error', (payload: { error?: string }) => {
@@ -183,6 +238,72 @@ export function QuizRoomPage() {
 		return null;
 	}
 
+	// Если квиз начался и есть текущий вопрос, показываем его
+	if (quizStarted && currentQuestion) {
+		return (
+			<main className="section section--center">
+				<section className="auth-card">
+					<h1 className="auth-title">Вопрос {currentQuestion.question_number} из {currentQuestion.total_questions}</h1>
+					<p className="section__subtitle" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
+						{currentQuestion.question_text}
+					</p>
+					<div className="answers-list">
+						{currentQuestion.answers.map((answer) => {
+							const isAnswered = answeredQuestionId === currentQuestion.question_id;
+							return (
+								<button
+									key={answer.id}
+									type="button"
+									className="primary-button"
+									style={{
+										marginBottom: '1rem',
+										width: '100%',
+										opacity: isAnswered ? 0.6 : 1,
+										cursor: isAnswered ? 'not-allowed' : 'pointer',
+									}}
+									disabled={isAnswered}
+									onClick={() => {
+										// Отправляем ответ
+										if (socketRef.current && sessionIdRef.current && !isAnswered) {
+											socketRef.current.emit('submit_answer', {
+												question_id: currentQuestion.question_id,
+												answer_id: answer.id,
+											});
+											setAnsweredQuestionId(currentQuestion.question_id);
+										}
+									}}
+								>
+									{answer.text}
+								</button>
+							);
+						})}
+					</div>
+					{answeredQuestionId === currentQuestion.question_id ? (
+						<p className="section__subtitle" style={{ color: 'green' }}>
+							Ответ отправлен! Ожидаем результатов...
+						</p>
+					) : null}
+					<p className="section__subtitle">
+						Время на ответ: {currentQuestion.time_limit} сек
+					</p>
+				</section>
+			</main>
+		);
+	}
+
+	// Если квиз начался, но вопроса еще нет - показываем ожидание
+	if (quizStarted && !currentQuestion) {
+		return (
+			<main className="section section--center">
+				<section className="auth-card">
+					<h1 className="auth-title">Квиз начался</h1>
+					<p className="section__subtitle">Ожидаем следующий вопрос...</p>
+				</section>
+			</main>
+		);
+	}
+
+	// Обычный вид комнаты (до начала квиза)
 	return (
 		<main className="section section--center">
 			<section className="auth-card">
