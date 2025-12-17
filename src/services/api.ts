@@ -1,7 +1,8 @@
-const DEFAULT_API_URL = 'https://quizz-room-server.onrender.com';
+// API URL из переменной окружения (.env файл)
+// По умолчанию используется production URL (fallback)
+const DEFAULT_API_URL = 'https://quizz-room-server.netlify.app';
 
 export const API_URL =
-	// eslint-disable-next-line no-process-env
 	import.meta.env.VITE_API_URL ?? DEFAULT_API_URL;
 
 export async function apiRequest<TResponse>(
