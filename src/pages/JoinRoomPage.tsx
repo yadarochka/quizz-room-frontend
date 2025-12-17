@@ -58,14 +58,7 @@ export function JoinRoomPage() {
 			});
 		});
 
-		socket.on('room_joined', (payload: {
-			session_id?: number;
-			quiz_id?: number;
-			participants?: Array<{
-				display_name: string;
-				user_id: number;
-			}>;
-		}) => {
+		socket.on('room_joined', () => {
 			setSocketStatus('joined');
 			setIsJoining(false);
 			// TODO: Переход на страницу ожидания/игры
