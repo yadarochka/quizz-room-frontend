@@ -10,7 +10,7 @@ import type { Question } from '../types/quiz';
 
 type EditableQuestion = Question;
 
-const DEFAULT_TIME_LIMIT = 30;
+const DEFAULT_TIME_LIMIT = 15;
 const MIN_TIME_LIMIT = 5;
 const MAX_TIME_LIMIT = 600;
 
