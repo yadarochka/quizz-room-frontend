@@ -18,7 +18,6 @@ import { useAuth } from '../auth/AuthContext';
 import {
 	getSessionResults,
 	type SessionResults,
-	type ParticipantAnswer,
 } from '../services/quizzes';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -419,7 +418,7 @@ export function QuizResultsPage() {
 											}}>
 												{participantAnswers
 													.sort((a, b) => a.question_order - b.question_order)
-													.map((answer, ansIdx) => (
+													.map((answer) => (
 														<div
 															key={answer.question_id}
 															style={{
