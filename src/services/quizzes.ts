@@ -152,9 +152,12 @@ export async function getSessionResults(
 	return apiRequest<SessionResults>(`/api/sessions/${sessionId}/results`);
 }
 
+export type AIProvider = 'groq' | 'openai' | 'gemini' | 'deepseek';
+
 export type GenerateQuestionsPayload = {
 	topic: string;
 	count?: number;
+	provider?: AIProvider;
 };
 
 export type GeneratedQuestion = {
