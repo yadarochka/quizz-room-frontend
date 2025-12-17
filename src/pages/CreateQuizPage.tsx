@@ -10,8 +10,10 @@ import { API_URL } from '../services/api';
 import {
 	createQuiz,
 	createSession,
+	getSession,
 	type CreatedQuiz,
 	type CreatedSession,
+	type SessionParticipant,
 } from '../services/quizzes';
 import type { Question } from '../types/quiz';
 
@@ -48,7 +50,11 @@ export function CreateQuizPage() {
 	const [socketStatus, setSocketStatus] = useState<
 		'idle' | 'connecting' | 'joined' | 'error'
 	>('idle');
+	const [participants, setParticipants] = useState<SessionParticipant[]>([]);
+	const [sessionId, setSessionId] = useState<number | null>(null);
+	const [isStarting, setIsStarting] = useState(false);
 	const socketRef = useRef<Socket | null>(null);
+	const sessionIdRef = useRef<number | null>(null);
 
 	useEffect(() => {
 		return () => {
@@ -147,8 +153,63 @@ export function CreateQuizPage() {
 			});
 		});
 
-		socket.on('room_joined', () => {
+		socket.on('room_joined', async (payload: {
+			session_id?: number;
+			quiz_id?: number;
+			participants?: Array<{
+				display_name: string;
+				user_id: number;
+			}>;
+		}) => {
 			setSocketStatus('joined');
+			if (payload.session_id) {
+				setSessionId(payload.session_id);
+				sessionIdRef.current = payload.session_id;
+				// Загружаем актуальный список участников
+				try {
+					const session = await getSession(payload.session_id);
+					setParticipants(session.participants || []);
+				} catch (err) {
+					// Если не удалось загрузить, используем данные из payload
+					if (payload.participants) {
+						setParticipants(payload.participants.map(p => ({
+							...p,
+							joined_at: new Date().toISOString(),
+						})));
+					}
+				}
+			} else if (payload.participants) {
+				setParticipants(payload.participants.map(p => ({
+					...p,
+					joined_at: new Date().toISOString(),
+				})));
+			}
+		});
+
+		socket.on('participant_joined', async () => {
+			// Обновляем список участников при подключении нового
+			const currentSessionId = sessionIdRef.current;
+			if (currentSessionId) {
+				try {
+					const session = await getSession(currentSessionId);
+					setParticipants(session.participants || []);
+				} catch {
+					// Игнорируем ошибки при обновлении
+				}
+			}
+		});
+
+		socket.on('participant_left', async () => {
+			// Обновляем список при отключении участника
+			const currentSessionId = sessionIdRef.current;
+			if (currentSessionId) {
+				try {
+					const session = await getSession(currentSessionId);
+					setParticipants(session.participants || []);
+				} catch {
+					// Игнорируем ошибки при обновлении
+				}
+			}
 		});
 
 		socket.on('room_join_error', (payload: { error?: string }) => {
@@ -165,6 +226,29 @@ export function CreateQuizPage() {
 			if (socketStatus !== 'error') {
 				setSocketStatus('idle');
 			}
+		});
+
+		socket.on('quiz_started', () => {
+			// Квиз начался, можно перейти на страницу игры
+		});
+
+		socket.on('quiz_error', (payload: { error?: string }) => {
+			setError(payload?.error || 'Ошибка при запуске квиза');
+			setIsStarting(false);
+		});
+	};
+
+	const handleStartQuiz = () => {
+		if (!socketRef.current || !sessionId) {
+			setError('Нет подключения к комнате');
+			return;
+		}
+
+		setIsStarting(true);
+		setError(null);
+
+		socketRef.current.emit('start_quiz', {
+			session_id: sessionId,
 		});
 	};
 
@@ -419,11 +503,38 @@ export function CreateQuizPage() {
 							Код комнаты: <strong>{createdSession.room_code}</strong>
 						</div>
 						<p className="section__subtitle">
-							Статус соединения: {socketStatus}
+							Статус соединения: {socketStatus === 'joined' ? 'Подключено' : socketStatus}
 						</p>
 						{createdQuiz ? (
 							<p className="section__subtitle">
 								Квиз: {createdQuiz.title}
+							</p>
+						) : null}
+
+						{socketStatus === 'joined' && participants.length > 0 ? (
+							<div className="participants-section">
+								<p className="section__subtitle">
+									Участников подключено: <strong>{participants.length}</strong>
+								</p>
+								<ul className="participants-list">
+									{participants.map((p, idx) => (
+										<li key={p.user_id || idx}>
+											{p.display_name}
+										</li>
+									))}
+								</ul>
+								<button
+									type="button"
+									className="primary-button"
+									onClick={handleStartQuiz}
+									disabled={isStarting}
+								>
+									{isStarting ? 'Запускаем квиз...' : 'Начать квиз'}
+								</button>
+							</div>
+						) : socketStatus === 'joined' ? (
+							<p className="section__subtitle">
+								Ожидаем участников...
 							</p>
 						) : null}
 					</div>

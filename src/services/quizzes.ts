@@ -51,4 +51,24 @@ export async function createSession(
 	});
 }
 
+export type SessionParticipant = {
+	user_id: number;
+	display_name: string;
+	joined_at: string;
+};
+
+export type SessionInfo = {
+	id: number;
+	quiz_id: number;
+	room_code: string;
+	status: string;
+	participants: SessionParticipant[];
+};
+
+export async function getSession(
+	sessionId: number,
+): Promise<SessionInfo> {
+	return apiRequest<SessionInfo>(`/api/sessions/${sessionId}`);
+}
+
 
