@@ -81,4 +81,29 @@ export async function getSessionByQuizId(
 	return apiRequest<SessionInfoWithCreator>(`/api/sessions/quiz/${quizId}`);
 }
 
+export type QuizListItem = {
+	id: number;
+	title: string;
+	description: string | null;
+	creator_id: number;
+	created_at: string;
+	updated_at: string;
+};
+
+export type QuizListResponse = {
+	data: QuizListItem[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export async function getMyQuizzes(
+	page: number = 1,
+	limit: number = 10,
+): Promise<QuizListResponse> {
+	return apiRequest<QuizListResponse>(
+		`/api/quizzes?page=${page}&limit=${limit}`,
+	);
+}
+
 
