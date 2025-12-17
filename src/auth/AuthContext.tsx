@@ -1,23 +1,23 @@
 import {
 	createContext,
 	type ReactNode,
+	useCallback,
 	useContext,
 	useEffect,
 	useState,
 } from 'react';
 import {
-	type AuthResponse,
 	type AuthUser,
-	LOCAL_STORAGE_TOKEN_KEY,
+	fetchCurrentUser,
+	logoutRequest,
 } from '../services/auth';
 
 type AuthContextValue = {
 	user: AuthUser | null;
-	token: string | null;
 	isAuthenticated: boolean;
 	loading: boolean;
-	setAuth: (data: AuthResponse) => void;
-	logout: () => void;
+	refreshUser: () => Promise<void>;
+	logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -28,40 +28,40 @@ type AuthProviderProps = {
 
 export function AuthProvider({ children }: AuthProviderProps) {
 	const [user, setUser] = useState<AuthUser | null>(null);
-	const [token, setToken] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		const savedToken =
-			localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY) ?? null;
-
-		if (savedToken) {
-			setToken(savedToken);
+	const refreshUser = useCallback(async () => {
+		setLoading(true);
+		try {
+			const me = await fetchCurrentUser();
+			setUser(me);
+		} catch (error) {
+			setUser(null);
+			throw error;
+		} finally {
+			setLoading(false);
 		}
-
-		setLoading(false);
 	}, []);
 
-	const setAuth = (data: AuthResponse) => {
-		setUser(data.user);
-		setToken(data.token);
-		localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, data.token);
-	};
+	useEffect(() => {
+		void refreshUser().catch(() => {});
+	}, [refreshUser]);
 
-	const logout = () => {
-		setUser(null);
-		setToken(null);
-		localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
-	};
+	const logout = useCallback(async () => {
+		try {
+			await logoutRequest();
+		} finally {
+			setUser(null);
+		}
+	}, []);
 
 	return (
 		<AuthContext.Provider
 			value={{
 				user,
-				token,
-				isAuthenticated: Boolean(token),
+				isAuthenticated: Boolean(user),
 				loading,
-				setAuth,
+				refreshUser,
 				logout,
 			}}
 		>

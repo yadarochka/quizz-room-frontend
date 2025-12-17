@@ -2,17 +2,15 @@ import { apiRequest, API_URL } from './api';
 
 export type AuthUser = {
 	id: string;
-	email: string;
+	email: string | null;
 	name: string;
-	avatarUrl?: string;
+	avatarUrl?: string | null;
 };
 
 export type AuthResponse = {
 	token: string;
 	user: AuthUser;
 };
-
-export const LOCAL_STORAGE_TOKEN_KEY = 'quizz-room-token';
 
 export function getAuthRedirectUrl(): string {
 	const redirectUri = `${window.location.origin}/auth/yandex/callback`;
@@ -26,6 +24,27 @@ export async function exchangeYandexCode(code: string): Promise<AuthResponse> {
 		method: 'POST',
 		body: JSON.stringify({ code }),
 	});
+}
+
+export async function fetchCurrentUser(): Promise<AuthUser> {
+	const user = await apiRequest<{
+		id: number | string;
+		email: string | null;
+		name: string;
+		avatar_url?: string | null;
+		avatarUrl?: string | null;
+	}>('/auth/me');
+
+	return {
+		id: String(user.id),
+		email: user.email,
+		name: user.name,
+		avatarUrl: user.avatarUrl ?? user.avatar_url ?? null,
+	};
+}
+
+export async function logoutRequest(): Promise<void> {
+	await apiRequest('/auth/logout', { method: 'GET' });
 }
 
 
