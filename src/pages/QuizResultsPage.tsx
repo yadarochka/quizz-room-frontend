@@ -15,6 +15,7 @@ import {
 	Cell,
 } from 'recharts';
 import { useAuth } from '../auth/AuthContext';
+import { Loader } from '../components/Loader';
 import {
 	getSessionResults,
 	type SessionResults,
@@ -96,7 +97,9 @@ export function QuizResultsPage() {
 	if (!isAuthenticated || isLoading) {
 		return (
 			<main className="section section--center" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-				<div style={{ color: 'white', fontSize: '1.5rem' }}>Загрузка результатов...</div>
+				<div className="loader-container loader-container--dark">
+					<Loader size="large" text="Загрузка результатов..." />
+				</div>
 			</main>
 		);
 	}

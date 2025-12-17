@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { useAuth } from './auth/AuthContext';
 import { Header } from './components/Header';
+import { Loader } from './components/Loader';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { ActiveQuizzesPage } from './pages/ActiveQuizzesPage';
 import { CreateQuizPage } from './pages/CreateQuizPage';
@@ -20,8 +21,8 @@ function App() {
 
 	if (loading) {
 		return (
-			<div className="page">
-				<p>Загрузка...</p>
+			<div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+				<Loader size="large" />
 			</div>
 		);
 	}

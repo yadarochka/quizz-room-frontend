@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { io, type Socket } from 'socket.io-client';
 import { useAuth } from '../auth/AuthContext';
+import { Loader } from '../components/Loader';
 import { API_URL } from '../services/api';
 import {
 	getSessionByQuizId,
@@ -267,7 +268,7 @@ export function QuizRoomPage() {
 	if (!isAuthenticated || isLoading) {
 		return (
 			<main className="section section--center">
-				<p>Загрузка...</p>
+				<Loader size="large" />
 			</main>
 		);
 	}

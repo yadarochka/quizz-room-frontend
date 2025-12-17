@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Loader } from '../components/Loader';
 import {
 	createSession,
 	getMyQuizzes,
@@ -67,7 +68,7 @@ export function HomePage() {
 	if (isLoading) {
 		return (
 			<main className="section section--center">
-				<p>Загрузка...</p>
+				<Loader size="large" />
 			</main>
 		);
 	}
