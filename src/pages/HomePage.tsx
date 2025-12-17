@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
 	createSession,
 	getMyQuizzes,
+	getSessionByQuizId,
 	type QuizListItem,
 } from '../services/quizzes';
 
@@ -37,7 +38,19 @@ export function HomePage() {
 		setError(null);
 
 		try {
-			// Создаем сессию для квиза
+			// Проверяем, есть ли уже активная сессия для этого квиза
+			try {
+				const existingSession = await getSessionByQuizId(quizId);
+				// Если есть активная сессия, переходим в неё
+				if (existingSession && (existingSession.status === 'waiting' || existingSession.status === 'in_progress')) {
+					navigate(`/quizzes/${quizId}`);
+					return;
+				}
+			} catch {
+				// Если активной сессии нет, создаём новую
+			}
+
+			// Создаем новую сессию для квиза
 			await createSession(quizId);
 			// Переходим в комнату
 			navigate(`/quizzes/${quizId}`);
