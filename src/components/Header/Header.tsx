@@ -10,7 +10,7 @@ type HeaderProps = {
 
 export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
 	const navigate = useNavigate();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, logout } = useAuth();
 
 	const handleLogoClick = () => {
 		navigate('/');
@@ -19,6 +19,17 @@ export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
 
 	const handleNavClick = () => {
 		setIsNavOpen(false);
+	};
+
+	const handleLogout = async () => {
+		try {
+			await logout();
+			navigate('/login');
+			setIsNavOpen(false);
+		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.error('Logout error:', error);
+		}
 	};
 
 	return (
@@ -55,6 +66,30 @@ export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
 						<Link to="/completed" onClick={handleNavClick}>
 							Проведенные квизы
 						</Link>
+						<button
+							type="button"
+							onClick={handleLogout}
+							className="header__logout"
+							style={{
+								background: 'transparent',
+								border: 'none',
+								color: 'inherit',
+								cursor: 'pointer',
+								fontSize: 'inherit',
+								fontFamily: 'inherit',
+								padding: '0.5rem 1rem',
+								borderRadius: '8px',
+								transition: 'background-color 0.2s',
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.backgroundColor = 'transparent';
+							}}
+						>
+							Выйти
+						</button>
 					</>
 				) : (
 					<Link to="/login" onClick={handleNavClick}>
