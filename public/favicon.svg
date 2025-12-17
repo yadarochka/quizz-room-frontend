@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Фон -->
+  <rect width="100" height="100" rx="20" fill="url(#grad1)"/>
+  
+  <!-- Вопрос в круге -->
+  <circle cx="50" cy="50" r="35" fill="white" opacity="0.95"/>
+  <text x="50" y="65" font-family="Arial, sans-serif" font-size="45" font-weight="bold" fill="#667eea" text-anchor="middle">?</text>
+  
+  <!-- Декоративные элементы -->
+  <circle cx="25" cy="25" r="5" fill="white" opacity="0.6"/>
+  <circle cx="75" cy="25" r="5" fill="white" opacity="0.6"/>
+  <circle cx="25" cy="75" r="5" fill="white" opacity="0.6"/>
+  <circle cx="75" cy="75" r="5" fill="white" opacity="0.6"/>
+</svg>
+
