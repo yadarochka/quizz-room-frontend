@@ -37,6 +37,7 @@ export function CreateQuizPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [aiTopic, setAiTopic] = useState('');
+	const [questionCount, setQuestionCount] = useState(5);
 
 	const handleChangeQuestion = (id: number, value: string) => {
 		setQuestions((prev) =>
@@ -126,10 +127,15 @@ export function CreateQuizPage() {
 		setIsGenerating(true);
 		setError(null);
 
+		// Автоматически заполняем название квиза, если оно пустое
+		if (!title.trim()) {
+			setTitle(aiTopic.trim());
+		}
+
 		try {
 			const result = await generateQuestions({
 				topic: aiTopic.trim(),
-				count: 5,
+				count: questionCount,
 			});
 
 			// Преобразуем сгенерированные вопросы в формат EditableQuestion
@@ -294,7 +300,13 @@ export function CreateQuizPage() {
 									className="field__input"
 									placeholder="Например: История России, Математика, Фильмы 90-х"
 									value={aiTopic}
-									onChange={(event) => setAiTopic(event.target.value)}
+									onChange={(event) => {
+										setAiTopic(event.target.value);
+										// Автозаполнение названия квиза, если оно пустое
+										if (!title.trim()) {
+											setTitle(event.target.value);
+										}
+									}}
 									disabled={isGenerating}
 									style={{
 										background: 'white',
@@ -310,6 +322,31 @@ export function CreateQuizPage() {
 										}
 									}}
 								/>
+							</label>
+							<label className="field" style={{ margin: 0, minWidth: '150px' }}>
+								<span className="field__label" style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem' }}>
+									Количество вопросов
+								</span>
+								<select
+									className="field__input"
+									value={questionCount}
+									onChange={(e) => setQuestionCount(Number(e.target.value))}
+									disabled={isGenerating}
+									style={{
+										background: 'white',
+										padding: '0.875rem 1rem',
+										fontSize: '1rem',
+										border: 'none',
+										borderRadius: '8px',
+										cursor: isGenerating ? 'not-allowed' : 'pointer',
+									}}
+								>
+									<option value={3}>3 вопроса</option>
+									<option value={5}>5 вопросов</option>
+									<option value={10}>10 вопросов</option>
+									<option value={15}>15 вопросов</option>
+									<option value={20}>20 вопросов</option>
+								</select>
 							</label>
 							<button
 								type="button"
@@ -353,8 +390,9 @@ export function CreateQuizPage() {
 							borderRadius: '8px',
 						}}>
 							<p style={{ margin: 0, fontSize: '0.95rem', opacity: 0.95, lineHeight: '1.5' }}>
-								💡 <strong>ИИ автоматически создаст 5 вопросов</strong> с 4 вариантами ответов каждый по указанной теме. 
+								💡 <strong>ИИ автоматически создаст {questionCount} вопросов</strong> с 4 вариантами ответов каждый по указанной теме. 
 								Вопросы будут добавлены в список ниже, и вы сможете их отредактировать.
+								{questionCount > 10 && ' Большое количество вопросов будет сгенерировано в несколько этапов.'}
 							</p>
 						</div>
 					</div>
