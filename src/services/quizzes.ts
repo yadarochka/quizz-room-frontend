@@ -106,4 +106,25 @@ export async function getMyQuizzes(
 	);
 }
 
+export type SessionResultParticipant = {
+	user_id: number;
+	display_name: string;
+	correct_answers: number;
+	total_questions: number;
+	score: number;
+};
+
+export type SessionResults = {
+	session_id: number;
+	quiz_title: string;
+	total_questions: number;
+	participants: SessionResultParticipant[];
+};
+
+export async function getSessionResults(
+	sessionId: number,
+): Promise<SessionResults> {
+	return apiRequest<SessionResults>(`/api/sessions/${sessionId}/results`);
+}
+
 

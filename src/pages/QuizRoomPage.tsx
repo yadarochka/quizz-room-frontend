@@ -166,11 +166,11 @@ export function QuizRoomPage() {
 			setCurrentQuestion(null);
 		});
 
-		socket.on('quiz_finished', () => {
-			// Квиз завершен
-			setQuizStarted(false);
-			setCurrentQuestion(null);
-			setAnsweredQuestionId(null);
+		socket.on('quiz_finished', (payload: { results?: unknown }) => {
+			// Квиз завершен, переходим на страницу результатов
+			if (sessionIdRef.current) {
+				navigate(`/results/${sessionIdRef.current}`, { replace: true });
+			}
 		});
 
 		socket.on('answer_submitted', () => {

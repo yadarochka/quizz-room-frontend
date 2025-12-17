@@ -11,6 +11,7 @@ import { JoinRoomPage } from './pages/JoinRoomPage';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { QuizResultsPage } from './pages/QuizResultsPage';
 import { QuizRoomPage } from './pages/QuizRoomPage';
 
 function App() {
@@ -79,6 +80,16 @@ function App() {
 					element={
 						isAuthenticated ? (
 							<ActiveQuizzesPage />
+						) : (
+							<Navigate to="/login" replace />
+						)
+					}
+				/>
+				<Route
+					path="/results/:sessionId"
+					element={
+						isAuthenticated ? (
+							<QuizResultsPage />
 						) : (
 							<Navigate to="/login" replace />
 						)
