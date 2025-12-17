@@ -37,3 +37,12 @@ body {
     box-shadow: 0 6px 20px rgba(255, 68, 68, 0.6);
   }
 }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
