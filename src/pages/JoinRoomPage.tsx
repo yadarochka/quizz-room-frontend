@@ -96,7 +96,10 @@ export function JoinRoomPage() {
 
 	return (
 		<main className="section section--center">
-			<section className="auth-card" style={{ maxWidth: '100%', width: '100%' }}>
+			<section
+				className="auth-card"
+				style={{ maxWidth: '420px', width: '100%', margin: '0 auto' }}
+			>
 				<h1 className="auth-title">Присоединиться к квизу</h1>
 				<p className="auth-subtitle">
 					Введите код комнаты, чтобы присоединиться к квизу.
@@ -144,6 +147,7 @@ export function JoinRoomPage() {
 					<button
 						type="submit"
 						className="primary-button auth-button"
+						style={{ marginTop: '16px' }}
 						disabled={isJoining || socketStatus === 'joined'}
 					>
 						{isJoining

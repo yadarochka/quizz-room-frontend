@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Loader } from '../components/Loader/Loader';
 import { io, type Socket } from 'socket.io-client';
 import { useAuth } from '../auth/AuthContext';
 import { Loader } from '../components/Loader';
@@ -489,10 +490,27 @@ export function QuizRoomPage() {
 	// Если квиз начался, но вопроса еще нет - показываем ожидание
 	if (quizStarted && !currentQuestion) {
 		return (
-			<main className="section section--center">
-				<section className="auth-card" style={{ maxWidth: '100%', width: '100%' }}>
-					<h1 className="auth-title">Квиз начался</h1>
-					<p className="section__subtitle">Ожидаем следующий вопрос...</p>
+			<main className="section section--center" style={{ padding: '2rem 1rem' }}>
+				<section
+					className="auth-card"
+					style={{
+						maxWidth: '100%',
+						width: '100%',
+						padding: '2rem',
+						boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+							justifyContent: 'center',
+							minHeight: '200px',
+						}}
+					>
+						<Loader size="medium" text="Ожидаем следующий вопрос..." />
+					</div>
 				</section>
 			</main>
 		);
