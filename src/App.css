@@ -395,6 +395,13 @@
   gap: 16px;
 }
 
+.quizzes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
 .question-block {
   padding: 16px 16px 18px;
   border-radius: 18px;
@@ -715,6 +722,38 @@
 }
 
 @media (max-width: 640px) {
+  .create-section {
+    border-radius: 24px;
+    padding: 20px 16px 24px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  }
+
+  .create-title {
+    font-size: 22px;
+  }
+
+  .questions-block__header,
+  .options-block__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .quizzes-list {
+    gap: 12px;
+  }
+
+  .quiz-card > div {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .quiz-card .primary-button {
+    width: 100%;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
   .header {
     padding: 16px 0 0;
   }
@@ -723,6 +762,7 @@
     position: absolute;
     top: 52px;
     right: 0;
+    z-index: 1000;
     flex-direction: column;
     gap: 10px;
     padding: 12px 16px;
