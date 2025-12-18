@@ -29,6 +29,7 @@ function buildInitialQuestion(): EditableQuestion {
 export function CreateQuizPage() {
 	const navigate = useNavigate();
 	const [title, setTitle] = useState('');
+	const [isTitleTouched, setIsTitleTouched] = useState(false);
 	const [description, setDescription] = useState('');
 	const [questions, setQuestions] = useState<EditableQuestion[]>([
 		buildInitialQuestion(),
@@ -79,21 +80,17 @@ export function CreateQuizPage() {
 		);
 	};
 
-	const handleToggleCorrectOption = (questionId: number, optionId: number) => {
+	const handleSetCorrectOption = (questionId: number, optionId: number) => {
 		setQuestions((prev) =>
 			prev.map((question) =>
 				question.id !== questionId
 					? question
 					: {
 							...question,
-							options: question.options.map((option) =>
-								option.id === optionId
-									? {
-											...option,
-											isCorrect: !option.isCorrect,
-									  }
-									: option,
-							),
+							options: question.options.map((option) => ({
+								...option,
+								isCorrect: option.id === optionId,
+							})),
 					  },
 			),
 		);
@@ -128,8 +125,8 @@ export function CreateQuizPage() {
 		setIsGenerating(true);
 		setError(null);
 
-		// Автоматически заполняем название квиза, если оно пустое
-		if (!title.trim()) {
+		// Автоматически заполняем название квиза, если пользователь его ещё не менял
+		if (!isTitleTouched && !title.trim()) {
 			setTitle(aiTopic.trim());
 		}
 
@@ -154,8 +151,19 @@ export function CreateQuizPage() {
 				}),
 			);
 
-			// Добавляем сгенерированные вопросы к существующим
-			setQuestions((prev) => [...prev, ...generatedQuestions]);
+			// Если существующие вопросы пустые, заменяем их сгенерированными.
+			// Иначе — добавляем новые вопросы в конец списка.
+			setQuestions((prev) => {
+				const hasFilledQuestion = prev.some(
+					(question) => question.text.trim().length > 0,
+				);
+
+				if (!hasFilledQuestion) {
+					return generatedQuestions;
+				}
+
+				return [...prev, ...generatedQuestions];
+			});
 			setAiTopic(''); // Очищаем поле после успешной генерации
 		} catch (err) {
 			const message =
@@ -259,7 +267,10 @@ export function CreateQuizPage() {
 							className="field__input"
 							placeholder="Например: Викторина по фильмам"
 							value={title}
-							onChange={(event) => setTitle(event.target.value)}
+							onChange={(event) => {
+								setTitle(event.target.value);
+								setIsTitleTouched(true);
+							}}
 						/>
 					</label>
 
@@ -312,7 +323,7 @@ export function CreateQuizPage() {
 								}}
 							>
 								<option value="groq">Groq (Llama 3.1) - Бесплатно, быстро</option>
-								<option value="openrouter">OpenRouter.ai (GPT-3.5) - Платно</option>
+								<option value="openrouter">OpenRouter.ai (GPT-3.5) - С лимитом, долго</option>
 							</select>
 						</label>
 						<div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -327,8 +338,8 @@ export function CreateQuizPage() {
 									value={aiTopic}
 									onChange={(event) => {
 										setAiTopic(event.target.value);
-										// Автозаполнение названия квиза, если оно пустое
-										if (!title.trim()) {
+										// Автозаполнение названия квиза, если пользователь его ещё не менял
+										if (!isTitleTouched) {
 											setTitle(event.target.value);
 										}
 									}}
@@ -489,48 +500,37 @@ export function CreateQuizPage() {
 										</div>
 
 										<div className="options-list">
-											{question.options.map(
-												(option, idx) => (
-													<div
-														key={option.id}
-														className="option-row"
-													>
-														<label className="option-checkbox">
-															<input
-																type="checkbox"
-																checked={
-																	option.isCorrect
-																}
-																onChange={() =>
-																	handleToggleCorrectOption(
-																		question.id,
-																		option.id,
-																	)
-																}
-															/>
-															<span>
-																Правильный ответ
-															</span>
-														</label>
+											{question.options.map((option, idx) => (
+												<div key={option.id} className="option-row">
+													<label className="option-checkbox">
 														<input
-															type="text"
-															className="field__input option-input"
-															placeholder={`Вариант ${
-																idx + 1
-															}`}
-															value={option.text}
-															onChange={(event) =>
-																handleChangeOptionText(
+															type="radio"
+															name={`correct-answer-${question.id}`}
+															checked={option.isCorrect}
+															onChange={() =>
+																handleSetCorrectOption(
 																	question.id,
 																	option.id,
-																	event.target
-																		.value,
 																)
 															}
 														/>
-													</div>
-												),
-											)}
+														<span>Правильный ответ</span>
+													</label>
+													<input
+														type="text"
+														className="field__input option-input"
+														placeholder={`Вариант ${idx + 1}`}
+														value={option.text}
+														onChange={(event) =>
+															handleChangeOptionText(
+																question.id,
+																option.id,
+																event.target.value,
+															)
+														}
+													/>
+												</div>
+											))}
 										</div>
 									</div>
 								</div>
