@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader } from '../components/Loader/Loader';
 import { io, type Socket } from 'socket.io-client';
 import { useAuth } from '../auth/AuthContext';
 import { Loader } from '../components/Loader';
