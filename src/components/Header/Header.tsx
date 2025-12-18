@@ -74,11 +74,7 @@ export function Header({ isNavOpen, setIsNavOpen }: HeaderProps) {
 							Выйти
 						</button>
 					</>
-				) : (
-					<Link to="/login" onClick={handleNavClick}>
-						Войти
-					</Link>
-				)}
+				): <></>}
 			</nav>
 			<button
 				type="button"

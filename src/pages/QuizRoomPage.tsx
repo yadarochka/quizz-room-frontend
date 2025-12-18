@@ -478,9 +478,6 @@ export function QuizRoomPage() {
 							</p>
 						</div>
 					) : null}
-					<p className="section__subtitle">
-						Время на ответ: {currentQuestion.time_limit} сек
-					</p>
 				</section>
 			</main>
 		);
